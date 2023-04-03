@@ -13,4 +13,11 @@ export const Colors = {
   RED: Color("#FF0000"),
   BLUE: Color("#0000FF"),
   TRANSPARENT: Color("#000000").alpha(0),
+  BLACK: Color("#000000"),
+  WHITE: Color("#FFFFFF"),
+  LIGHTING: {
+    WARM: Color("#FFCCCC"),
+    NEUTRAL: Color("#E5CCE5"),
+    COLD: Color("#CCCCFF"),
+  },
 };
