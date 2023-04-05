@@ -6,11 +6,11 @@ import React, {
 } from "react";
 
 type Environment = {
-  setCameraControlsEnabled: (enabled: boolean) => void;
+  setCurrentlyDragging: (enabled: boolean) => void;
 };
 
 const EnvironmentContext = createContext<Environment>({
-  setCameraControlsEnabled: () => {},
+  setCurrentlyDragging: () => {},
 });
 
 export function EnvironmentContextProvider({

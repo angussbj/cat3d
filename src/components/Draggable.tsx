@@ -14,7 +14,7 @@ export const Draggable: React.FC<DraggableProps> = ({
   initialPosition = new Vector3(0, 0, 0),
 }) => {
   const objectRef = useRef<Group>(null);
-  const { setCameraControlsEnabled } = useEnvironment();
+  const { setCurrentlyDragging } = useEnvironment();
   const { camera, size } = useThree();
 
   // Raycaster and plane used to project the mouse movements from the camera onto the plane
@@ -29,7 +29,7 @@ export const Draggable: React.FC<DraggableProps> = ({
 
   const bind = useDrag(({ xy: [x, y], first, last }) => {
     if (first) {
-      setCameraControlsEnabled(false);
+      setCurrentlyDragging(false);
       const cameraDirection = new Vector3();
       camera.getWorldDirection(cameraDirection);
       planeRef.current.setFromNormalAndCoplanarPoint(
@@ -37,7 +37,7 @@ export const Draggable: React.FC<DraggableProps> = ({
         objectRef.current?.position || new Vector3(0, 0, 0)
       );
     }
-    if (last) setCameraControlsEnabled(true);
+    if (last) setCurrentlyDragging(true);
 
     if (objectRef.current) {
       const screenCoords = new Vector2(

@@ -10,11 +10,11 @@ export function Environment({
 }: {
   children: ReactNode;
 }): React.ReactElement {
-  const [cameraControlsEnabled, setCameraControlsEnabled] = useState(true);
+  const [currentlyDragging, setCurrentlyDragging] = useState(true);
 
   return (
     <div style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }}>
-      <EnvironmentContextProvider environment={{ setCameraControlsEnabled }}>
+      <EnvironmentContextProvider environment={{ setCurrentlyDragging }}>
         <Canvas
           style={{ background: Colors.BLACK.toString() }}
           camera={{ position: [0, 0, 10] }}
@@ -22,7 +22,7 @@ export function Environment({
         >
           <Lighting />
           {children}
-          {cameraControlsEnabled && <OrbitControls autoRotate={false} />}
+          {currentlyDragging && <OrbitControls autoRotate={false} />}
         </Canvas>
       </EnvironmentContextProvider>
     </div>
