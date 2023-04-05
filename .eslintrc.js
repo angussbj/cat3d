@@ -22,6 +22,7 @@ module.exports = {
   rules: {
     semi: ["error", "always"],
     "react/prop-types": "off",
+    "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/explicit-function-return-type": "error",
     "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
     "@typescript-eslint/ban-types": [
