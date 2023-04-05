@@ -19,7 +19,7 @@ export const Draggable: React.FC<DraggableProps> = ({
 
   // Raycaster and plane used to project the mouse movements from the camera onto the plane
   const raycaster = useMemo(() => new Raycaster(), []);
-  const plane = useMemo(() => new Plane(new Vector3(0, 0, 1), 0), []);
+  const planeRef = useRef(new Plane(new Vector3(0, 0, 1)));
 
   useEffect(() => {
     if (objectRef.current) {
@@ -28,7 +28,15 @@ export const Draggable: React.FC<DraggableProps> = ({
   }, []);
 
   const bind = useDrag(({ xy: [x, y], first, last }) => {
-    if (first) setCameraControlsEnabled(false);
+    if (first) {
+      setCameraControlsEnabled(false);
+      const cameraDirection = new Vector3();
+      camera.getWorldDirection(cameraDirection);
+      planeRef.current.setFromNormalAndCoplanarPoint(
+        cameraDirection,
+        objectRef.current?.position || new Vector3(0, 0, 0)
+      );
+    }
     if (last) setCameraControlsEnabled(true);
 
     if (objectRef.current) {
@@ -39,7 +47,7 @@ export const Draggable: React.FC<DraggableProps> = ({
 
       raycaster.setFromCamera(screenCoords, camera);
       const intersection = new Vector3();
-      raycaster.ray.intersectPlane(plane, intersection);
+      raycaster.ray.intersectPlane(planeRef.current, intersection);
 
       objectRef.current.position.copy(intersection);
     }
