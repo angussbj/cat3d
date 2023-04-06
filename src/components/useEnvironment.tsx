@@ -4,13 +4,18 @@ import React, {
   ReactNode,
   useContext,
 } from "react";
+import { ControlMode } from "./ControlMode";
 
 type Environment = {
   setCurrentlyDragging: (enabled: boolean) => void;
+  setControlMode: (mode: ControlMode) => void;
+  controlMode: ControlMode;
 };
 
 const EnvironmentContext = createContext<Environment>({
   setCurrentlyDragging: () => {},
+  setControlMode: () => {},
+  controlMode: "view",
 });
 
 export function EnvironmentContextProvider({
