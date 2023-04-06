@@ -5,6 +5,7 @@ import { ControlMode } from "./ControlMode";
 import styled from "styled-components";
 import { capitalize } from "@material-ui/core";
 
+// Controls not currently needed, but this pattern will be needed soon
 export function Controls({
   style,
 }: {

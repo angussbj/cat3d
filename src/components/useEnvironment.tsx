@@ -8,12 +8,14 @@ import { ControlMode } from "./ControlMode";
 
 type Environment = {
   setCurrentlyDragging: (enabled: boolean) => void;
+  setOnBackgroundClick: (handler: (event: MouseEvent) => void) => void;
   setControlMode: (mode: ControlMode) => void;
   controlMode: ControlMode;
 };
 
 const EnvironmentContext = createContext<Environment>({
   setCurrentlyDragging: () => {},
+  setOnBackgroundClick: () => {},
   setControlMode: () => {},
   controlMode: "view",
 });

@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 
+// TODO: Replace with createRoot
 ReactDOM.render(
   <React.StrictMode>
     <App />

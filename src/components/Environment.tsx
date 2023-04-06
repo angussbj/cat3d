@@ -4,7 +4,6 @@ import { Lighting } from "./Lighting";
 import { Colors } from "ui";
 import { OrbitControls } from "@react-three/drei";
 import { EnvironmentContextProvider } from "./useEnvironment";
-import { Controls } from "./Controls";
 import { ControlMode } from "./ControlMode";
 
 export function Environment({
@@ -14,15 +13,24 @@ export function Environment({
 }): React.ReactElement {
   const [currentlyDragging, setCurrentlyDragging] = useState(false);
   const [controlMode, setControlMode] = useState<ControlMode>("view");
+  const [onBackgroundClick, setOnBackgroundClick] = useState<
+    (event: MouseEvent) => void
+  >(() => {});
 
   return (
     <div style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }}>
       <EnvironmentContextProvider
-        environment={{ setCurrentlyDragging, setControlMode, controlMode }}
+        environment={{
+          setCurrentlyDragging,
+          setOnBackgroundClick,
+          setControlMode,
+          controlMode,
+        }}
       >
         <Canvas
           style={{ background: Colors.BLACK.toString() }}
           camera={{ position: [0, 0, 10] }}
+          onPointerMissed={onBackgroundClick}
           shadows
         >
           <gridHelper args={[20, 20]} />
@@ -32,7 +40,6 @@ export function Environment({
             <OrbitControls autoRotate={false} />
           )}
         </Canvas>
-        <Controls style={{ position: "absolute", top: 16, left: 16 }} />
       </EnvironmentContextProvider>
     </div>
   );

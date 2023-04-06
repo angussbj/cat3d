@@ -47,7 +47,8 @@ export const Draggable: React.FC<DraggableProps> = ({
     return intersection;
   }, []);
 
-  const bind = useDrag(({ xy: [x, y], first, last }) => {
+  const bind = useDrag(({ xy: [x, y], first, last, event }) => {
+    event.stopPropagation();
     if (first) {
       setCurrentlyDragging(true);
 
