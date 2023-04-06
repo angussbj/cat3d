@@ -23,7 +23,7 @@ export function Content(): React.ReactElement {
           event.altKey ||
           event.metaKey ||
           event.shiftKey ||
-          event.button != 1
+          event.button > 1
         ) {
           return;
         }
