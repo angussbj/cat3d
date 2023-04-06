@@ -12,7 +12,7 @@ export function Environment({
 }: {
   children: ReactNode;
 }): React.ReactElement {
-  const [currentlyDragging, setCurrentlyDragging] = useState(true);
+  const [currentlyDragging, setCurrentlyDragging] = useState(false);
   const [controlMode, setControlMode] = useState<ControlMode>("view");
 
   return (
@@ -28,7 +28,9 @@ export function Environment({
           <gridHelper args={[20, 20]} />
           <Lighting />
           {children}
-          {currentlyDragging && <OrbitControls autoRotate={false} />}
+          {!currentlyDragging && controlMode == "view" && (
+            <OrbitControls autoRotate={false} />
+          )}
         </Canvas>
         <Controls style={{ position: "absolute", top: 16, left: 16 }} />
       </EnvironmentContextProvider>

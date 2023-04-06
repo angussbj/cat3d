@@ -49,7 +49,7 @@ export const Draggable: React.FC<DraggableProps> = ({
 
   const bind = useDrag(({ xy: [x, y], first, last }) => {
     if (first) {
-      setCurrentlyDragging(false);
+      setCurrentlyDragging(true);
 
       const cameraDirection = new Vector3();
       camera.getWorldDirection(cameraDirection);
@@ -62,7 +62,7 @@ export const Draggable: React.FC<DraggableProps> = ({
         objectRef.current?.position.clone().sub(screenToSpace(x, y)) ||
         new Vector3(0, 0, 0);
     }
-    if (last) setCurrentlyDragging(true);
+    if (last) setCurrentlyDragging(false);
 
     if (objectRef.current) {
       objectRef.current.position.copy(
