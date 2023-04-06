@@ -10,7 +10,7 @@ export function getSphereGeometry(
     semicirclePoints.push(
       new Vector2(
         radius * Math.sin((i * Math.PI) / resolution),
-        radius * Math.cos((i * Math.PI) / resolution)
+        -radius * Math.cos((i * Math.PI) / resolution)
       )
     );
   }

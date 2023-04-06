@@ -20,6 +20,7 @@ export function Environment({
           camera={{ position: [0, 0, 10] }}
           shadows
         >
+          <gridHelper args={[20, 20]} />
           <Lighting />
           {children}
           {currentlyDragging && <OrbitControls autoRotate={false} />}
