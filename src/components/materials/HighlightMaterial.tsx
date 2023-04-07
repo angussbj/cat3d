@@ -8,10 +8,9 @@ interface Props {
 
 export function HighlightMaterial({ color }: Props): React.ReactElement {
   return (
-    <meshStandardMaterial
+    <meshBasicMaterial
       attach="material"
-      emissive={color.toString()}
-      emissiveIntensity={0.5}
+      color={color.toString()}
       side={BackSide}
     />
   );

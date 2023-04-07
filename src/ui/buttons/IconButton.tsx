@@ -2,7 +2,6 @@ import React from "react";
 import { IconButton as MuiIconButton } from "@material-ui/core";
 import { useHover } from "../useHover";
 import Color from "color";
-import { Colors } from "../Colors";
 
 interface Props {
   onClick: () => void;
@@ -14,7 +13,7 @@ interface Props {
 }
 
 export function IconButton({
-  color = Colors.ACCENT_BLUE,
+  color,
   disabled,
   style,
   children,

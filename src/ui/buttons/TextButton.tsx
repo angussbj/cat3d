@@ -12,7 +12,7 @@ interface Props {
 }
 
 export function TextButton({
-  color = Colors.ACCENT_BLUE,
+  color = Colors.LIGHT,
   style,
   ...rest
 }: Props): React.ReactElement {

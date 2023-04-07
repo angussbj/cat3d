@@ -21,7 +21,7 @@ export function Checkbox<T extends string>({
 }: Props<T>): React.ReactElement {
   const [renderHelper, setRenderHelper] = useState(false);
   const [ref, hovered] = useHover();
-  const color = Colors.ACCENT_BLUE.fade(hovered ? 0.2 : 0).toString();
+  const color = Colors.HIGHLIGHTS[0].fade(hovered ? 0.2 : 0).toString();
 
   return (
     <div style={style} ref={ref}>
@@ -33,7 +33,7 @@ export function Checkbox<T extends string>({
             setRenderHelper(!renderHelper);
           }}
           style={{
-            color: Colors.ACCENT_BLUE.toString(),
+            color: color,
             backgroundColor: "transparent",
           }}
           icon={<ImCheckboxUnchecked size={11} color={color} />}

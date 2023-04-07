@@ -12,7 +12,7 @@ import { HighlightMaterial } from "./materials";
 export function Content(): React.ReactElement {
   const [elements] = useState(new Elements());
   const [nodeRadius] = useState(0.1);
-  const [highlightWidth] = useState(0.02);
+  const [highlightWidth] = useState(0.005);
   const { setOnBackgroundClick, render } = useEnvironment();
   const { camera, size } = useThree();
 
@@ -56,15 +56,11 @@ export function Content(): React.ReactElement {
             castShadow
             receiveShadow
           >
-            <SolidMaterial color={Colors.DARK} />
+            <SolidMaterial color={Colors.GREY} />
           </mesh>
           {selected && (
-            <mesh
-              geometry={getSphereGeometry(nodeRadius + highlightWidth)}
-              castShadow
-              receiveShadow
-            >
-              <HighlightMaterial color={Colors.ACCENT_BLUE} />
+            <mesh geometry={getSphereGeometry(nodeRadius + highlightWidth)}>
+              <HighlightMaterial color={Colors.HIGHLIGHTS[0]} />
             </mesh>
           )}
         </Draggable>

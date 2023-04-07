@@ -18,7 +18,7 @@ export function Button({
   return (
     <BaseButton
       backgroundColor={color || Colors.LIGHT.fade(0.2)}
-      textColor={color.isLight() ? Colors.DARKEST : Colors.LIGHT}
+      textColor={color.isLight() ? Colors.DARK : Colors.LIGHT}
       {...rest}
     />
   );
