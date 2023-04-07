@@ -11,6 +11,7 @@ type Environment = {
   setOnBackgroundClick: (handler: (event: MouseEvent) => void) => void;
   setControlMode: (mode: ControlMode) => void;
   controlMode: ControlMode;
+  render: () => void;
 };
 
 const EnvironmentContext = createContext<Environment>({
@@ -18,6 +19,7 @@ const EnvironmentContext = createContext<Environment>({
   setOnBackgroundClick: () => {},
   setControlMode: () => {},
   controlMode: "view",
+  render: () => {},
 });
 
 export function EnvironmentContextProvider({

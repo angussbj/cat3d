@@ -21,6 +21,16 @@ export const Lighting: FC = () => {
         color={Colors.LIGHTING.NEUTRAL.toString()}
         castShadow={true}
       />
+      <directionalLight
+        position={[0, 20, 0]}
+        color={Colors.LIGHTING.WARM.toString()}
+        castShadow={true}
+      />
+      <directionalLight
+        position={[0, -20, 0]}
+        color={Colors.LIGHTING.COLD.toString()}
+        castShadow={true}
+      />
     </>
   );
 };
