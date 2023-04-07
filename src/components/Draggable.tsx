@@ -1,4 +1,5 @@
 import React, {
+  ReactElement,
   ReactNode,
   useCallback,
   useEffect,
@@ -9,16 +10,19 @@ import { useThree } from "@react-three/fiber";
 import { useDrag } from "react-use-gesture";
 import { Group, Plane, Raycaster, Vector2, Vector3 } from "three";
 import { useEnvironment } from "./useEnvironment";
+import { ClickEvent } from "./ClickEvent";
 
-type DraggableProps = {
+type Props = {
   position?: Vector3;
+  onClick?: (event: ClickEvent) => void;
   children?: ReactNode;
 };
 
-export const Draggable: React.FC<DraggableProps> = ({
+export const Draggable = ({
   position = new Vector3(0, 0, 0),
+  onClick,
   children,
-}) => {
+}: Props): ReactElement => {
   const objectRef = useRef<Group>(null);
   const { setCurrentlyDragging } = useEnvironment();
   const { camera, size } = useThree();
@@ -47,34 +51,37 @@ export const Draggable: React.FC<DraggableProps> = ({
     return intersection;
   }, []);
 
-  const bind = useDrag(({ xy: [x, y], first, last, event }) => {
-    event.stopPropagation();
-    if (first) {
-      setCurrentlyDragging(true);
+  const bind = useDrag(
+    ({ xy: [x, y], movement: [dx, dy], first, last, event }) => {
+      event.stopPropagation();
+      if (first) {
+        setCurrentlyDragging(true);
 
-      const cameraDirection = new Vector3();
-      camera.getWorldDirection(cameraDirection);
-      planeRef.current.setFromNormalAndCoplanarPoint(
-        cameraDirection,
-        objectRef.current?.position || new Vector3(0, 0, 0)
-      );
+        const cameraDirection = new Vector3();
+        camera.getWorldDirection(cameraDirection);
+        planeRef.current.setFromNormalAndCoplanarPoint(
+          cameraDirection,
+          objectRef.current?.position || new Vector3(0, 0, 0)
+        );
 
-      mouseObjectOffset.current =
-        objectRef.current?.position.clone().sub(screenToSpace(x, y)) ||
-        new Vector3(0, 0, 0);
+        mouseObjectOffset.current =
+          objectRef.current?.position.clone().sub(screenToSpace(x, y)) ||
+          new Vector3(0, 0, 0);
+      }
+
+      if (objectRef.current) {
+        objectRef.current.position.copy(
+          screenToSpace(x, y).add(mouseObjectOffset.current)
+        );
+      }
+
+      if (last) {
+        setCurrentlyDragging(false);
+        if (objectRef.current) position.copy(objectRef.current.position);
+        if (dx === 0 && dy === 0) onClick?.(event);
+      }
     }
-
-    if (objectRef.current) {
-      objectRef.current.position.copy(
-        screenToSpace(x, y).add(mouseObjectOffset.current)
-      );
-    }
-
-    if (last) {
-      setCurrentlyDragging(false);
-      if (objectRef.current) position.copy(objectRef.current.position);
-    }
-  }) as () => {};
+  ) as () => {};
 
   return (
     <group {...bind()} ref={objectRef}>

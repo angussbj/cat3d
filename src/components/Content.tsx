@@ -8,12 +8,13 @@ import { useThree } from "@react-three/fiber";
 import { Elements } from "logic";
 import { SolidMaterial } from "./materials/SolidMaterial";
 import { HighlightMaterial } from "./materials";
+import { ClickEvent } from "./ClickEvent";
 
 export function Content(): React.ReactElement {
-  const [elements] = useState(new Elements());
+  const { setOnBackgroundClick, render } = useEnvironment();
+  const [elements] = useState(new Elements(render));
   const [nodeRadius] = useState(0.1);
   const [highlightWidth] = useState(0.005);
-  const { setOnBackgroundClick, render } = useEnvironment();
   const { camera, size } = useThree();
 
   const raycaster = useMemo(() => new Raycaster(), []);
@@ -49,8 +50,12 @@ export function Content(): React.ReactElement {
 
   return (
     <>
-      {elements.getNodes().map(({ position, selected }, index) => (
-        <Draggable position={position} key={index}>
+      {elements.getNodes().map(({ position, id: nodeId }, index) => (
+        <Draggable
+          position={position}
+          key={index}
+          onClick={(event: ClickEvent): void => elements.onClick(nodeId, event)}
+        >
           <mesh
             geometry={getSphereGeometry(nodeRadius)}
             castShadow
@@ -58,7 +63,7 @@ export function Content(): React.ReactElement {
           >
             <SolidMaterial color={Colors.GREY} />
           </mesh>
-          {selected && (
+          {elements.isSelected(nodeId) && (
             <mesh geometry={getSphereGeometry(nodeRadius + highlightWidth)}>
               <HighlightMaterial color={Colors.HIGHLIGHTS[0]} />
             </mesh>
