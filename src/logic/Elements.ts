@@ -25,7 +25,7 @@ interface Arrow extends Element {
   id: ArrowId;
   domainId: NodeId;
   codomainId: NodeId;
-  guidePoints: Vector3[];
+  guidePoint: Vector3;
 }
 
 interface TwoArrow extends Element {
@@ -65,11 +65,32 @@ export class Elements {
   addArrow(domainId: NodeId, codomainId: NodeId): void {
     const id: ArrowId = `1a${this.arrowIdCounter}`;
     this.arrowIdCounter += 1;
-    this.arrows[id] = { domainId, codomainId, id, guidePoints: [] };
+    this.arrows[id] = {
+      domainId,
+      codomainId,
+      id,
+      guidePoint: new Vector3()
+        .copy(this.nodes[domainId].position)
+        .add(this.nodes[codomainId].position)
+        .multiplyScalar(0.5),
+    };
   }
 
   getNodes(): Node[] {
     return Object.values(this.nodes);
+  }
+
+  getArrows(): Arrow[] {
+    return Object.values(this.arrows);
+  }
+
+  getArrowPoints(id: ArrowId): [Vector3, Vector3, Vector3] {
+    const { domainId, guidePoint, codomainId } = this.arrows[id];
+    return [
+      this.nodes[domainId].position,
+      guidePoint,
+      this.nodes[codomainId].position,
+    ];
   }
 
   getSelectedNodeIds(): NodeId[] {

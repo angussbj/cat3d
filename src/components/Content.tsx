@@ -1,14 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Colors } from "ui";
-import { getSphereGeometry } from "./geometries/sphereGeometry";
 import { Draggable } from "./Draggable";
 import { Plane, Raycaster, Vector2, Vector3 } from "three";
 import { useEnvironment } from "./useEnvironment";
 import { useThree } from "@react-three/fiber";
 import { Elements } from "logic";
-import { SolidMaterial } from "./materials/SolidMaterial";
-import { HighlightMaterial } from "./materials";
+import { HighlightMaterial, SolidMaterial } from "./materials";
 import { ClickEvent } from "./ClickEvent";
+import { getBezierTubeGeometry, getSphereGeometry } from "./geometries";
 
 export function Content(): React.ReactElement {
   const { setOnBackgroundClick, render } = useEnvironment();
@@ -69,6 +68,22 @@ export function Content(): React.ReactElement {
             </mesh>
           )}
         </Draggable>
+      ))}
+      {elements.getArrows().map(({ id: arrowId }, index) => (
+        <>
+          <mesh
+            geometry={getBezierTubeGeometry(elements.getArrowPoints(arrowId))}
+            castShadow
+            receiveShadow
+          >
+            <SolidMaterial color={Colors.GREY} />
+          </mesh>
+          {elements.isSelected(arrowId) && (
+            <mesh geometry={getSphereGeometry(nodeRadius + highlightWidth)}>
+              <HighlightMaterial color={Colors.HIGHLIGHTS[0]} />
+            </mesh>
+          )}
+        </>
       ))}
     </>
   );
