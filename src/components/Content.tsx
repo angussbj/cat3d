@@ -6,9 +6,13 @@ import { Plane, Raycaster, Vector2, Vector3 } from "three";
 import { useEnvironment } from "./useEnvironment";
 import { useThree } from "@react-three/fiber";
 import { Elements } from "logic";
+import { SolidMaterial } from "./materials/SolidMaterial";
+import { HighlightMaterial } from "./materials";
 
 export function Content(): React.ReactElement {
   const [elements] = useState(new Elements());
+  const [nodeRadius] = useState(0.1);
+  const [highlightWidth] = useState(0.02);
   const { setOnBackgroundClick, render } = useEnvironment();
   const { camera, size } = useThree();
 
@@ -45,17 +49,24 @@ export function Content(): React.ReactElement {
 
   return (
     <>
-      {elements.getNodes().map(({ position }, index) => (
+      {elements.getNodes().map(({ position, selected }, index) => (
         <Draggable position={position} key={index}>
-          <mesh geometry={getSphereGeometry(1)} castShadow receiveShadow>
-            <meshStandardMaterial
-              attach="material"
-              color={Colors.DARK.toString()}
-              emissive={Colors.DARK.toString()}
-              emissiveIntensity={0}
-              roughness={0.5}
-            />
+          <mesh
+            geometry={getSphereGeometry(nodeRadius)}
+            castShadow
+            receiveShadow
+          >
+            <SolidMaterial color={Colors.DARK} />
           </mesh>
+          {selected && (
+            <mesh
+              geometry={getSphereGeometry(nodeRadius + highlightWidth)}
+              castShadow
+              receiveShadow
+            >
+              <HighlightMaterial color={Colors.ACCENT_BLUE} />
+            </mesh>
+          )}
         </Draggable>
       ))}
     </>

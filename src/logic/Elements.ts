@@ -5,33 +5,34 @@ type ArrowId = `1a${number}`;
 type TwoArrowId = `2a${number}`;
 type ThreeArrowId = `3a${number}`;
 
-interface Node {
-  id: NodeId;
-  position: Vector3;
+interface Element {
   label?: string;
+  selected?: boolean;
 }
 
-interface Arrow {
+interface Node extends Element {
+  id: NodeId;
+  position: Vector3;
+}
+
+interface Arrow extends Element {
   id: ArrowId;
   domainId: NodeId;
   codomainId: NodeId;
   guidePoints: Vector3[];
-  label?: string;
 }
 
-interface TwoArrow {
+interface TwoArrow extends Element {
   id: TwoArrowId;
   domainIds: ArrowId[];
   codomainIds: ArrowId[];
   guidePoint: Vector3;
-  label?: string;
 }
 
-interface ThreeArrow {
+interface ThreeArrow extends Element {
   id: ThreeArrowId;
   domainIds: TwoArrowId[];
   codomainIds: TwoArrowId[];
-  label?: string;
 }
 
 export class Elements {
@@ -54,7 +55,7 @@ export class Elements {
   addNode(position: Vector3): void {
     const id: NodeId = `n${this.nodeIdCounter}`;
     this.nodeIdCounter += 1;
-    this.nodes[id] = { position, id };
+    this.nodes[id] = { position, id, selected: true };
   }
 
   getNodes(): Node[] {
