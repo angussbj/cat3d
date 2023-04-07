@@ -5,7 +5,7 @@ import { ParametricGeometries } from "three/examples/jsm/geometries/ParametricGe
 export function getBezierTubeGeometry(
   points: [Vector3, Vector3, Vector3] | [Vector3, Vector3, Vector3, Vector3],
   radius = 0.02,
-  resolution = 24
+  resolution = 48
 ): BufferGeometry {
   return new ParametricGeometries.TubeGeometry(
     points.length === 3
@@ -13,6 +13,6 @@ export function getBezierTubeGeometry(
       : new CubicBezierCurve3(...points),
     resolution,
     radius,
-    resolution
+    12
   );
 }

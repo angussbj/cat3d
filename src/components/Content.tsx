@@ -5,17 +5,24 @@ import { Plane, Raycaster, Vector2, Vector3 } from "three";
 import { useEnvironment } from "./useEnvironment";
 import { useThree } from "@react-three/fiber";
 import { Elements } from "logic";
-import { HighlightMaterial, SolidMaterial } from "./materials";
+import {
+  HighlightMaterial,
+  SolidMaterial,
+  TranslucentMaterial,
+} from "./materials";
 import { ClickEvent } from "./ClickEvent";
 import { getBezierTubeGeometry, getSphereGeometry } from "./geometries";
 
 export function Content(): React.ReactElement {
   const { setOnBackgroundClick, render } = useEnvironment();
   const [elements] = useState(new Elements(render));
+  const { camera, size } = useThree();
+
+  // TODO: add options section to control these variables
   const [nodeRadius] = useState(0.1);
+  const [guidePointRadius] = useState(0.07);
   const [highlightWidth] = useState(0.005);
   const [arrowRadius] = useState(0.02);
-  const { camera, size } = useThree();
 
   const raycaster = useMemo(() => new Raycaster(), []);
   const plane = useMemo(() => new Plane(new Vector3(0, 1, 0)), []);
@@ -70,7 +77,7 @@ export function Content(): React.ReactElement {
           )}
         </Draggable>
       ))}
-      {elements.getArrows().map(({ id: arrowId }, index) => (
+      {elements.getArrows().map(({ id: arrowId, guidePoint }, index) => (
         <>
           <mesh
             geometry={getBezierTubeGeometry(
@@ -84,14 +91,21 @@ export function Content(): React.ReactElement {
             <SolidMaterial color={Colors.GREY} />
           </mesh>
           {elements.isSelected(arrowId) && (
-            <mesh
-              geometry={getBezierTubeGeometry(
-                elements.getArrowPoints(arrowId),
-                arrowRadius + highlightWidth
-              )}
-            >
-              <HighlightMaterial color={Colors.HIGHLIGHTS[0]} />
-            </mesh>
+            <>
+              <mesh
+                geometry={getBezierTubeGeometry(
+                  elements.getArrowPoints(arrowId),
+                  arrowRadius + highlightWidth
+                )}
+              >
+                <HighlightMaterial color={Colors.HIGHLIGHTS[0]} />
+              </mesh>
+              <Draggable position={guidePoint} key={index}>
+                <mesh geometry={getSphereGeometry(guidePointRadius)}>
+                  <TranslucentMaterial color={Colors.HIGHLIGHTS[0]} />
+                </mesh>
+              </Draggable>
+            </>
           )}
         </>
       ))}
