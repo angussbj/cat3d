@@ -65,14 +65,89 @@ export class Elements {
   private threeArrowIdCounter = 0;
   private selected: Record<ElementId, boolean> = {};
 
-  constructor(private render: () => void) {}
+  constructor(private render: () => void) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const serialisedNodes = urlParams.get("n");
+    if (serialisedNodes) this.setNodesFromSerialisedNodes(serialisedNodes);
+    const serialisedArrows = urlParams.get("a");
+    if (serialisedArrows) this.setArrowsFromSerialisedArrows(serialisedArrows);
+  }
+
+  // TODO: make update run after dragging
+  update(): void {
+    const url = new URL(window.location.toString());
+    url.searchParams.set("n", this.serialisedNodes());
+    url.searchParams.set("a", this.serialisedArrows());
+    window.history.pushState({}, "", url);
+    this.render();
+  }
+
+  serialisedNodes(): string {
+    return Object.values(this.nodes)
+      .map((n) =>
+        [
+          n.id,
+          n.position.x.toFixed(3),
+          n.position.y.toFixed(3),
+          n.position.z.toFixed(3),
+        ].join("*")
+      )
+      .join("_");
+  }
+
+  setNodesFromSerialisedNodes(serialised: string): void {
+    this.nodes = {};
+    serialised.split("_").forEach((str) => {
+      const pieces = str.split("*");
+      this.nodes[pieces[0] as NodeId] = {
+        id: pieces[0] as NodeId,
+        position: new Vector3(
+          parseFloat(pieces[1]),
+          parseFloat(pieces[2]),
+          parseFloat(pieces[3])
+        ),
+      };
+    });
+  }
+
+  serialisedArrows(): string {
+    return Object.values(this.arrows)
+      .map((a) =>
+        [
+          a.id,
+          a.domainId,
+          a.codomainId,
+          a.guidePoint.x.toFixed(3),
+          a.guidePoint.y.toFixed(3),
+          a.guidePoint.z.toFixed(3),
+        ].join("*")
+      )
+      .join("_");
+  }
+
+  setArrowsFromSerialisedArrows(serialised: string): void {
+    this.arrows = {};
+    serialised.split("_").forEach((str) => {
+      const pieces = str.split("*");
+      this.arrows[pieces[0] as ArrowId] = {
+        id: pieces[0] as ArrowId,
+        domainId: pieces[1] as NodeId,
+        codomainId: pieces[2] as NodeId,
+        guidePoint: new Vector3(
+          parseFloat(pieces[3]),
+          parseFloat(pieces[4]),
+          parseFloat(pieces[5])
+        ),
+      };
+    });
+  }
 
   addNode(position: Vector3): void {
     const id: NodeId = `n${this.nodeIdCounter}`;
     this.nodeIdCounter += 1;
     this.nodes[id] = { position, id };
     this.selected = {};
-    this.render();
+    this.update();
     autoBind(this);
   }
 
@@ -122,8 +197,7 @@ export class Elements {
   onClick(id: ElementId, event: ClickDetails): void {
     if (isNodeId(id)) this.onNodeClick(id, event);
     else if (isArrowId(id)) this.onArrowClick(id, event);
-    console.log(this.selected, this.nodes);
-    this.render();
+    this.update();
   }
 
   onNodeClick(id: NodeId, event: ClickDetails): void {
@@ -216,7 +290,7 @@ export class Elements {
         if (isThreeArrowId(id)) this.deleteThreeArrow(id);
       });
       this.selected = {};
-      this.render();
+      this.update();
     }
   }
 }
