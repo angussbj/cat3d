@@ -12,6 +12,10 @@ function isNodeId(id: ElementId): id is NodeId {
   return id.startsWith("n");
 }
 
+function isArrowId(id: ElementId): id is ArrowId {
+  return id.startsWith("1a");
+}
+
 interface Element {
   label?: string;
 }
@@ -99,20 +103,50 @@ export class Elements {
       .filter((x) => this.selected[x]);
   }
 
+  getSelectedArrowIds(): ArrowId[] {
+    return keys(this.selected)
+      .filter(isArrowId)
+      .filter((x) => this.selected[x]);
+  }
+
   onClick(id: ElementId, event: ClickDetails): void {
     if (isNodeId(id)) this.onNodeClick(id, event);
-    console.log(this);
+    else if (isArrowId(id)) this.onArrowClick(id, event);
+    this.render();
+    console.log(id);
   }
 
   onNodeClick(id: NodeId, event: ClickDetails): void {
     if (this.isSelected(id)) {
-      this.selected[id] = false;
+      if (event.shiftKey) {
+        this.selected[id] = false;
+      } else {
+        this.selected = {};
+      }
     } else if (event.shiftKey) {
       this.selected[id] = true;
     } else if (event.ctrlKey || event.metaKey) {
       this.getSelectedNodeIds().forEach((domainId) => {
         this.addArrow(domainId, id);
       });
+      this.selected = {};
+    } else {
+      this.selected = { [id]: true };
+    }
+  }
+
+  onArrowClick(id: ArrowId, event: ClickDetails): void {
+    if (this.isSelected(id)) {
+      if (event.shiftKey) {
+        this.selected[id] = false;
+      } else {
+        this.selected = {};
+      }
+    } else if (event.shiftKey && !(event.ctrlKey || event.metaKey)) {
+      // TODO: check that the selected arrows compose
+      this.selected[id] = true;
+    } else if (event.ctrlKey || event.metaKey) {
+      // TODO: work out how to build a 2-arrow
       this.selected = {};
     } else {
       this.selected = { [id]: true };

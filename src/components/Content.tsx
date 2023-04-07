@@ -14,6 +14,7 @@ export function Content(): React.ReactElement {
   const [elements] = useState(new Elements(render));
   const [nodeRadius] = useState(0.1);
   const [highlightWidth] = useState(0.005);
+  const [arrowRadius] = useState(0.02);
   const { camera, size } = useThree();
 
   const raycaster = useMemo(() => new Raycaster(), []);
@@ -72,14 +73,23 @@ export function Content(): React.ReactElement {
       {elements.getArrows().map(({ id: arrowId }, index) => (
         <>
           <mesh
-            geometry={getBezierTubeGeometry(elements.getArrowPoints(arrowId))}
+            geometry={getBezierTubeGeometry(
+              elements.getArrowPoints(arrowId),
+              arrowRadius
+            )}
+            onClick={(event): void => elements.onClick(arrowId, event)}
             castShadow
             receiveShadow
           >
             <SolidMaterial color={Colors.GREY} />
           </mesh>
           {elements.isSelected(arrowId) && (
-            <mesh geometry={getSphereGeometry(nodeRadius + highlightWidth)}>
+            <mesh
+              geometry={getBezierTubeGeometry(
+                elements.getArrowPoints(arrowId),
+                arrowRadius + highlightWidth
+              )}
+            >
               <HighlightMaterial color={Colors.HIGHLIGHTS[0]} />
             </mesh>
           )}

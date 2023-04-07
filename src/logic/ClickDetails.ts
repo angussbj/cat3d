@@ -1,11 +1,9 @@
-import { ModifierKey } from "react";
-
 export interface ClickDetails {
+  stopPropagation: () => void;
   altKey: boolean;
   button: number;
   buttons: number;
   ctrlKey: boolean;
-  getModifierState(key: ModifierKey): boolean;
   metaKey: boolean;
   shiftKey: boolean;
 }
