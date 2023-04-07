@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Colors } from "ui";
 import { Draggable } from "./Draggable";
 import { Plane, Raycaster, Vector2, Vector3 } from "three";
@@ -15,8 +15,21 @@ import { getBezierTubeGeometry, getSphereGeometry } from "./geometries";
 
 export function Content(): React.ReactElement {
   const { setOnBackgroundClick, render } = useEnvironment();
-  const [elements] = useState(new Elements(render));
+  const elements = useRef(new Elements(render)).current;
   const { camera, size } = useThree();
+
+  useEffect(() => {
+    document.addEventListener("keydown", elements.onKeyDown.bind(elements));
+
+    // TODO: load state from url
+
+    return (): void => {
+      document.removeEventListener(
+        "keydown",
+        elements.onKeyDown.bind(elements)
+      );
+    };
+  }, []);
 
   // TODO: add options section to control these variables
   const [nodeRadius] = useState(0.1);
@@ -57,10 +70,10 @@ export function Content(): React.ReactElement {
 
   return (
     <>
-      {elements.getNodes().map(({ position, id: nodeId }, index) => (
+      {elements.getNodes().map(({ position, id: nodeId }) => (
         <Draggable
           position={position}
-          key={index}
+          key={nodeId}
           onClick={(event: ClickEvent): void => elements.onClick(nodeId, event)}
         >
           <mesh
@@ -80,6 +93,7 @@ export function Content(): React.ReactElement {
       {elements.getArrows().map(({ id: arrowId, guidePoint }, index) => (
         <>
           <mesh
+            key={arrowId}
             geometry={getBezierTubeGeometry(
               elements.getArrowPoints(arrowId),
               arrowRadius
@@ -93,6 +107,7 @@ export function Content(): React.ReactElement {
           {elements.isSelected(arrowId) && (
             <>
               <mesh
+                key={arrowId + "highlight"}
                 geometry={getBezierTubeGeometry(
                   elements.getArrowPoints(arrowId),
                   arrowRadius + highlightWidth
@@ -100,7 +115,7 @@ export function Content(): React.ReactElement {
               >
                 <HighlightMaterial color={Colors.HIGHLIGHTS[0]} />
               </mesh>
-              <Draggable position={guidePoint} key={index}>
+              <Draggable position={guidePoint} key={arrowId + "guidePoint"}>
                 <mesh geometry={getSphereGeometry(guidePointRadius)}>
                   <TranslucentMaterial color={Colors.HIGHLIGHTS[0]} />
                 </mesh>

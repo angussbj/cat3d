@@ -1,6 +1,7 @@
 import { Vector3 } from "three";
 import { keys } from "../utilities/keys";
 import { ClickDetails } from "./ClickDetails";
+import autoBind from "auto-bind";
 
 type NodeId = `n${number}`;
 type ArrowId = `1a${number}`;
@@ -14,6 +15,14 @@ function isNodeId(id: ElementId): id is NodeId {
 
 function isArrowId(id: ElementId): id is ArrowId {
   return id.startsWith("1a");
+}
+
+function isTwoArrowId(id: ElementId): id is TwoArrowId {
+  return id.startsWith("2a");
+}
+
+function isThreeArrowId(id: ElementId): id is ThreeArrowId {
+  return id.startsWith("3a");
 }
 
 interface Element {
@@ -64,6 +73,7 @@ export class Elements {
     this.nodes[id] = { position, id };
     this.selected = {};
     this.render();
+    autoBind(this);
   }
 
   addArrow(domainId: NodeId, codomainId: NodeId): void {
@@ -112,8 +122,8 @@ export class Elements {
   onClick(id: ElementId, event: ClickDetails): void {
     if (isNodeId(id)) this.onNodeClick(id, event);
     else if (isArrowId(id)) this.onArrowClick(id, event);
+    console.log(this.selected, this.nodes);
     this.render();
-    console.log(id);
   }
 
   onNodeClick(id: NodeId, event: ClickDetails): void {
@@ -155,5 +165,58 @@ export class Elements {
 
   isSelected(id: ElementId): boolean {
     return !!this.selected[id];
+  }
+
+  deleteNode(id: NodeId): void {
+    delete this.nodes[id];
+    keys(this.arrows).forEach((arrowId) => {
+      const arrow = this.arrows[arrowId];
+      if (arrow.codomainId === id || arrow.domainId === id) {
+        delete this.arrows[arrowId];
+      }
+    });
+  }
+
+  deleteArrow(id: ArrowId): void {
+    delete this.arrows[id];
+    keys(this.twoArrows).forEach((twoArrowId) => {
+      const twoArrow = this.twoArrows[twoArrowId];
+      if (
+        twoArrow.codomainIds.includes(id) ||
+        twoArrow.domainIds.includes(id)
+      ) {
+        delete this.twoArrows[twoArrowId];
+      }
+    });
+  }
+
+  deleteTwoArrow(id: TwoArrowId): void {
+    delete this.twoArrows[id];
+    keys(this.threeArrows).forEach((threeArrowId) => {
+      const threeArrow = this.threeArrows[threeArrowId];
+      if (
+        threeArrow.codomainIds.includes(id) ||
+        threeArrow.domainIds.includes(id)
+      ) {
+        delete this.threeArrows[threeArrowId];
+      }
+    });
+  }
+
+  deleteThreeArrow(id: ThreeArrowId): void {
+    delete this.threeArrows[id];
+  }
+
+  onKeyDown(event: KeyboardEvent): void {
+    if (event.key === "Backspace") {
+      keys(this.selected).forEach((id) => {
+        if (isNodeId(id)) this.deleteNode(id);
+        if (isArrowId(id)) this.deleteArrow(id);
+        if (isTwoArrowId(id)) this.deleteTwoArrow(id);
+        if (isThreeArrowId(id)) this.deleteThreeArrow(id);
+      });
+      this.selected = {};
+      this.render();
+    }
   }
 }
