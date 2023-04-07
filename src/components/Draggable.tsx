@@ -11,13 +11,13 @@ import { Group, Plane, Raycaster, Vector2, Vector3 } from "three";
 import { useEnvironment } from "./useEnvironment";
 
 type DraggableProps = {
-  initialPosition?: Vector3;
+  position?: Vector3;
   children?: ReactNode;
 };
 
 export const Draggable: React.FC<DraggableProps> = ({
+  position = new Vector3(0, 0, 0),
   children,
-  initialPosition = new Vector3(0, 0, 0),
 }) => {
   const objectRef = useRef<Group>(null);
   const { setCurrentlyDragging } = useEnvironment();
@@ -30,7 +30,7 @@ export const Draggable: React.FC<DraggableProps> = ({
 
   useEffect(() => {
     if (objectRef.current) {
-      objectRef.current.position.copy(initialPosition);
+      objectRef.current.position.copy(position);
     }
   }, []);
 
@@ -63,12 +63,16 @@ export const Draggable: React.FC<DraggableProps> = ({
         objectRef.current?.position.clone().sub(screenToSpace(x, y)) ||
         new Vector3(0, 0, 0);
     }
-    if (last) setCurrentlyDragging(false);
 
     if (objectRef.current) {
       objectRef.current.position.copy(
         screenToSpace(x, y).add(mouseObjectOffset.current)
       );
+    }
+
+    if (last) {
+      setCurrentlyDragging(false);
+      if (objectRef.current) position.copy(objectRef.current.position);
     }
   }) as () => {};
 

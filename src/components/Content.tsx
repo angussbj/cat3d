@@ -8,7 +8,6 @@ import { useThree } from "@react-three/fiber";
 import { Elements } from "logic";
 
 export function Content(): React.ReactElement {
-  // TODO: when dragging it doesn't update this position and that is bad
   const [elements] = useState(new Elements());
   const { setOnBackgroundClick, render } = useEnvironment();
   const { camera, size } = useThree();
@@ -47,7 +46,7 @@ export function Content(): React.ReactElement {
   return (
     <>
       {elements.getNodes().map(({ position }, index) => (
-        <Draggable initialPosition={position} key={index}>
+        <Draggable position={position} key={index}>
           <mesh geometry={getSphereGeometry(1)} castShadow receiveShadow>
             <meshStandardMaterial
               attach="material"
