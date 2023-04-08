@@ -1,41 +1,37 @@
-import { Arrow, ArrowId, NodeId } from "../Element";
+import { Node, NodeId } from "../Element";
 import { Vector3 } from "three";
 
-export function serialiseArrows(arrows: Record<ArrowId, Arrow>): string {
-  return Object.values(arrows)
-    .map((a) =>
+export function serialiseNodes(nodes: Record<NodeId, Node>): string {
+  return Object.values(nodes)
+    .map((n) =>
       [
-        a.id,
-        a.domainId,
-        a.codomainId,
-        a.guidePoint.x.toFixed(3),
-        a.guidePoint.y.toFixed(3),
-        a.guidePoint.z.toFixed(3),
+        n.id,
+        n.position.x.toFixed(3),
+        n.position.y.toFixed(3),
+        n.position.z.toFixed(3),
       ].join("*")
     )
     .join("_");
 }
 
-export function deserialiseArrows(serialised: string): Record<ArrowId, Arrow> {
-  const arrows: Record<ArrowId, Arrow> = {};
+export function deserialiseNodes(serialised: string): Record<NodeId, Node> {
+  const nodes: Record<NodeId, Node> = {};
   try {
     serialised.split("_").forEach((str) => {
       const pieces = str.split("*");
-      arrows[pieces[0] as ArrowId] = {
-        id: pieces[0] as ArrowId,
-        domainId: pieces[1] as NodeId,
-        codomainId: pieces[2] as NodeId,
-        guidePoint: new Vector3(
-          parseFloat(pieces[3]),
-          parseFloat(pieces[4]),
-          parseFloat(pieces[5])
+      nodes[pieces[0] as NodeId] = {
+        id: pieces[0] as NodeId,
+        position: new Vector3(
+          parseFloat(pieces[1]),
+          parseFloat(pieces[2]),
+          parseFloat(pieces[3])
         ),
       };
     });
   } catch {
     // eslint-disable-next-line no-console
-    console.warn("Error deserialising Arrows, defaulting to empty");
+    console.warn("Error deserialising Nodes, defaulting to empty");
     return {};
   }
-  return arrows;
+  return nodes;
 }

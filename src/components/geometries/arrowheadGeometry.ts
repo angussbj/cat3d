@@ -20,9 +20,9 @@ export function getArrowheadGeometry(
       : new CubicBezierCurve3(...points);
   const tangent = bezier.getTangent(1);
   const endpoint = points.slice(-1)[0];
-  const arrowheadStartPoint = endpoint.sub(
-    tangent.clone().multiplyScalar(length)
-  );
+  const arrowheadStartPoint = endpoint
+    .clone()
+    .sub(tangent.clone().multiplyScalar(length));
   return new ConeGeometry(radius, length, resolution)
     .applyQuaternion(
       new Quaternion().setFromUnitVectors(new Vector3(0, 1, 0), tangent)

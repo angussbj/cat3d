@@ -26,6 +26,10 @@ import {
 import { SelectionState } from "./SelectionState";
 import { AddToast } from "react-toast-notifications";
 import { composeArrows } from "./composeArrows";
+import {
+  deserialiseTwoArrows,
+  serialiseTwoArrows,
+} from "./serialisation/serialiseTwoArrows";
 
 export class Elements {
   private nodes: Record<NodeId, Node> = {};
@@ -48,6 +52,11 @@ export class Elements {
     const serialisedArrows = urlParams.get("a");
     if (serialisedArrows) this.arrows = deserialiseArrows(serialisedArrows);
     this.arrowIdCounter = keys(this.arrows).length;
+
+    const serialisedTwoArrows = urlParams.get("a2");
+    if (serialisedTwoArrows)
+      this.twoArrows = deserialiseTwoArrows(serialisedTwoArrows);
+    this.twoArrowIdCounter = keys(this.twoArrows).length;
   }
 
   // TODO: make update run after dragging
@@ -55,6 +64,7 @@ export class Elements {
     const url = new URL(window.location.toString());
     url.searchParams.set("n", serialiseNodes(this.nodes));
     url.searchParams.set("a", serialiseArrows(this.arrows));
+    url.searchParams.set("a2", serialiseTwoArrows(this.twoArrows));
     window.history.pushState({}, "", url);
     this.render();
   }
