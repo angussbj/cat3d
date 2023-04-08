@@ -1,20 +1,20 @@
 {
   "files": {
     "main.css": "/cat3d/static/css/main.ce810c5f.chunk.css",
-    "main.js": "/cat3d/static/js/main.11c33a97.chunk.js",
-    "main.js.map": "/cat3d/static/js/main.11c33a97.chunk.js.map",
+    "main.js": "/cat3d/static/js/main.db8e9888.chunk.js",
+    "main.js.map": "/cat3d/static/js/main.db8e9888.chunk.js.map",
     "runtime-main.js": "/cat3d/static/js/runtime-main.5ed9659e.js",
     "runtime-main.js.map": "/cat3d/static/js/runtime-main.5ed9659e.js.map",
-    "static/js/2.d1bdf04f.chunk.js": "/cat3d/static/js/2.d1bdf04f.chunk.js",
-    "static/js/2.d1bdf04f.chunk.js.map": "/cat3d/static/js/2.d1bdf04f.chunk.js.map",
+    "static/js/2.cb0b330c.chunk.js": "/cat3d/static/js/2.cb0b330c.chunk.js",
+    "static/js/2.cb0b330c.chunk.js.map": "/cat3d/static/js/2.cb0b330c.chunk.js.map",
     "index.html": "/cat3d/index.html",
     "static/css/main.ce810c5f.chunk.css.map": "/cat3d/static/css/main.ce810c5f.chunk.css.map",
-    "static/js/2.d1bdf04f.chunk.js.LICENSE.txt": "/cat3d/static/js/2.d1bdf04f.chunk.js.LICENSE.txt"
+    "static/js/2.cb0b330c.chunk.js.LICENSE.txt": "/cat3d/static/js/2.cb0b330c.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.5ed9659e.js",
-    "static/js/2.d1bdf04f.chunk.js",
+    "static/js/2.cb0b330c.chunk.js",
     "static/css/main.ce810c5f.chunk.css",
-    "static/js/main.11c33a97.chunk.js"
+    "static/js/main.db8e9888.chunk.js"
   ]
 }
