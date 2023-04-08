@@ -2,57 +2,27 @@ import { Vector3 } from "three";
 import { keys } from "../utilities/keys";
 import { ClickDetails } from "./ClickDetails";
 import autoBind from "auto-bind";
-
-type NodeId = `n${number}`;
-type ArrowId = `1a${number}`;
-type TwoArrowId = `2a${number}`;
-type ThreeArrowId = `3a${number}`;
-type ElementId = NodeId | ArrowId | TwoArrowId | ThreeArrowId;
-
-function isNodeId(id: ElementId): id is NodeId {
-  return id.startsWith("n");
-}
-
-function isArrowId(id: ElementId): id is ArrowId {
-  return id.startsWith("1a");
-}
-
-function isTwoArrowId(id: ElementId): id is TwoArrowId {
-  return id.startsWith("2a");
-}
-
-function isThreeArrowId(id: ElementId): id is ThreeArrowId {
-  return id.startsWith("3a");
-}
-
-interface Element {
-  label?: string;
-}
-
-interface Node extends Element {
-  id: NodeId;
-  position: Vector3;
-}
-
-interface Arrow extends Element {
-  id: ArrowId;
-  domainId: NodeId;
-  codomainId: NodeId;
-  guidePoint: Vector3;
-}
-
-interface TwoArrow extends Element {
-  id: TwoArrowId;
-  domainIds: ArrowId[];
-  codomainIds: ArrowId[];
-  guidePoint: Vector3;
-}
-
-interface ThreeArrow extends Element {
-  id: ThreeArrowId;
-  domainIds: TwoArrowId[];
-  codomainIds: TwoArrowId[];
-}
+import {
+  Arrow,
+  ArrowId,
+  ElementId,
+  isArrowId,
+  isNodeId,
+  isThreeArrowId,
+  isTwoArrowId,
+  Node,
+  NodeId,
+  ThreeArrow,
+  ThreeArrowId,
+  TwoArrow,
+  TwoArrowId,
+} from "./Element";
+import {
+  deserialiseArrows,
+  deserialiseNodes,
+  serialiseArrows,
+  serialiseNodes,
+} from "./serialisation";
 
 export class Elements {
   private nodes: Record<NodeId, Node> = {};
@@ -68,78 +38,18 @@ export class Elements {
   constructor(private render: () => void) {
     const urlParams = new URLSearchParams(window.location.search);
     const serialisedNodes = urlParams.get("n");
-    if (serialisedNodes) this.setNodesFromSerialisedNodes(serialisedNodes);
+    if (serialisedNodes) this.nodes = deserialiseNodes(serialisedNodes);
     const serialisedArrows = urlParams.get("a");
-    if (serialisedArrows) this.setArrowsFromSerialisedArrows(serialisedArrows);
+    if (serialisedArrows) this.arrows = deserialiseArrows(serialisedArrows);
   }
 
   // TODO: make update run after dragging
   update(): void {
     const url = new URL(window.location.toString());
-    url.searchParams.set("n", this.serialisedNodes());
-    url.searchParams.set("a", this.serialisedArrows());
+    url.searchParams.set("n", serialiseNodes(this.nodes));
+    url.searchParams.set("a", serialiseArrows(this.arrows));
     window.history.pushState({}, "", url);
     this.render();
-  }
-
-  serialisedNodes(): string {
-    return Object.values(this.nodes)
-      .map((n) =>
-        [
-          n.id,
-          n.position.x.toFixed(3),
-          n.position.y.toFixed(3),
-          n.position.z.toFixed(3),
-        ].join("*")
-      )
-      .join("_");
-  }
-
-  setNodesFromSerialisedNodes(serialised: string): void {
-    this.nodes = {};
-    serialised.split("_").forEach((str) => {
-      const pieces = str.split("*");
-      this.nodes[pieces[0] as NodeId] = {
-        id: pieces[0] as NodeId,
-        position: new Vector3(
-          parseFloat(pieces[1]),
-          parseFloat(pieces[2]),
-          parseFloat(pieces[3])
-        ),
-      };
-    });
-  }
-
-  serialisedArrows(): string {
-    return Object.values(this.arrows)
-      .map((a) =>
-        [
-          a.id,
-          a.domainId,
-          a.codomainId,
-          a.guidePoint.x.toFixed(3),
-          a.guidePoint.y.toFixed(3),
-          a.guidePoint.z.toFixed(3),
-        ].join("*")
-      )
-      .join("_");
-  }
-
-  setArrowsFromSerialisedArrows(serialised: string): void {
-    this.arrows = {};
-    serialised.split("_").forEach((str) => {
-      const pieces = str.split("*");
-      this.arrows[pieces[0] as ArrowId] = {
-        id: pieces[0] as ArrowId,
-        domainId: pieces[1] as NodeId,
-        codomainId: pieces[2] as NodeId,
-        guidePoint: new Vector3(
-          parseFloat(pieces[3]),
-          parseFloat(pieces[4]),
-          parseFloat(pieces[5])
-        ),
-      };
-    });
   }
 
   addNode(position: Vector3): void {
