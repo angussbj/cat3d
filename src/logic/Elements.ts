@@ -23,6 +23,7 @@ import {
   serialiseArrows,
   serialiseNodes,
 } from "./serialisation";
+import { SelectionState } from "./SelectionState";
 
 export class Elements {
   private nodes: Record<NodeId, Node> = {};
@@ -33,7 +34,7 @@ export class Elements {
   private arrowIdCounter = 0;
   private twoArrowIdCounter = 0;
   private threeArrowIdCounter = 0;
-  private selected: Record<ElementId, boolean> = {};
+  private selected: Record<ElementId, false | "primary" | "secondary"> = {};
 
   constructor(private render: () => void) {
     const urlParams = new URLSearchParams(window.location.search);
@@ -111,44 +112,46 @@ export class Elements {
   }
 
   onNodeClick(id: NodeId, event: ClickDetails): void {
-    if (this.isSelected(id)) {
+    if (this.selectionState(id)) {
       if (event.shiftKey) {
         this.selected[id] = false;
       } else {
         this.selected = {};
       }
     } else if (event.shiftKey) {
-      this.selected[id] = true;
+      this.selected[id] = "primary";
     } else if (event.ctrlKey || event.metaKey) {
       this.getSelectedNodeIds().forEach((domainId) => {
         this.addArrow(domainId, id);
       });
       this.selected = {};
     } else {
-      this.selected = { [id]: true };
+      this.selected = { [id]: "primary" };
     }
   }
 
   onArrowClick(id: ArrowId, event: ClickDetails): void {
-    if (this.isSelected(id)) {
+    if (this.selectionState(id)) {
       if (event.shiftKey) {
         this.selected[id] = false;
       } else {
         this.selected = {};
       }
-    } else if (event.shiftKey && !(event.ctrlKey || event.metaKey)) {
-      // TODO: check that the selected arrows compose
-      this.selected[id] = true;
+    } else if (event.shiftKey && (event.ctrlKey || event.metaKey)) {
+      // TODO: work out how to check head-to-tail-ness
+      this.selected[id] = "secondary";
+    } else if (event.shiftKey) {
+      this.selected[id] = "primary";
     } else if (event.ctrlKey || event.metaKey) {
       // TODO: work out how to build a 2-arrow
-      this.selected = {};
+      this.selected[id] = "secondary";
     } else {
-      this.selected = { [id]: true };
+      this.selected = { [id]: "primary" };
     }
   }
 
-  isSelected(id: ElementId): boolean {
-    return !!this.selected[id];
+  selectionState(id: ElementId): SelectionState {
+    return this.selected[id] ?? false;
   }
 
   deleteNode(id: NodeId): void {
