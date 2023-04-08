@@ -33,6 +33,7 @@ export function deserialiseArrows(serialised: string): Record<ArrowId, Arrow> {
       };
     });
   } catch {
+    // eslint-disable-next-line no-console
     console.warn("Error deserialising Arrows, defaulting to empty");
     return {};
   }

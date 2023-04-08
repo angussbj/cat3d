@@ -29,6 +29,7 @@ export function deserialiseNodes(serialised: string): Record<NodeId, Node> {
       };
     });
   } catch {
+    // eslint-disable-next-line no-console
     console.warn("Error deserialising Nodes, defaulting to empty");
     return {};
   }

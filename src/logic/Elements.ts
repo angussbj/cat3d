@@ -1,5 +1,5 @@
 import { Vector3 } from "three";
-import { keys } from "../utilities/keys";
+import { average, keys } from "utilities";
 import { ClickDetails } from "./ClickDetails";
 import autoBind from "auto-bind";
 import {
@@ -24,6 +24,8 @@ import {
   serialiseNodes,
 } from "./serialisation";
 import { SelectionState } from "./SelectionState";
+import { AddToast } from "react-toast-notifications";
+import { composeArrows } from "./composeArrows";
 
 export class Elements {
   private nodes: Record<NodeId, Node> = {};
@@ -36,12 +38,16 @@ export class Elements {
   private threeArrowIdCounter = 0;
   private selected: Record<ElementId, false | "primary" | "secondary"> = {};
 
-  constructor(private render: () => void) {
+  constructor(private render: () => void, private addToast: AddToast) {
     const urlParams = new URLSearchParams(window.location.search);
+
     const serialisedNodes = urlParams.get("n");
     if (serialisedNodes) this.nodes = deserialiseNodes(serialisedNodes);
+    this.nodeIdCounter = keys(this.nodes).length;
+
     const serialisedArrows = urlParams.get("a");
     if (serialisedArrows) this.arrows = deserialiseArrows(serialisedArrows);
+    this.arrowIdCounter = keys(this.arrows).length;
   }
 
   // TODO: make update run after dragging
@@ -69,11 +75,46 @@ export class Elements {
       domainId,
       codomainId,
       id,
-      guidePoint: new Vector3()
-        .copy(this.nodes[domainId].position)
-        .add(this.nodes[codomainId].position)
-        .multiplyScalar(0.5),
+      guidePoint: average(
+        this.nodes[domainId].position,
+        this.nodes[codomainId].position
+      ),
     };
+  }
+
+  addTwoArrow(
+    domainIds: ArrowId[],
+    codomainIds: ArrowId[],
+    guidePoint: Vector3
+  ): void {
+    const id: TwoArrowId = `2a${this.twoArrowIdCounter}`;
+    this.twoArrowIdCounter += 1;
+    this.twoArrows[id] = {
+      domainIds,
+      codomainIds,
+      id,
+      guidePoint,
+    };
+  }
+
+  addTwoArrowFromSelectionIfPossible(): void {
+    const domainArrows = this.getSelectedArrows("primary");
+    const codomainArrows = this.getSelectedArrows("secondary");
+    const domain = composeArrows(domainArrows);
+    const codomain = composeArrows(codomainArrows);
+    if (!domain || !codomain) return;
+    if (
+      domain.domainId !== codomain.domainId ||
+      domain.codomainId !== codomain.codomainId
+    ) {
+      return;
+    }
+    this.addTwoArrow(
+      domain.sequence,
+      codomain.sequence,
+      average(...[...domainArrows, ...codomainArrows].map((a) => a.guidePoint))
+    );
+    this.selected = {};
   }
 
   getNodes(): Node[] {
@@ -99,10 +140,16 @@ export class Elements {
       .filter((x) => this.selected[x]);
   }
 
-  getSelectedArrowIds(): ArrowId[] {
+  getSelectedArrowIds(selectionState?: SelectionState): ArrowId[] {
     return keys(this.selected)
       .filter(isArrowId)
-      .filter((x) => this.selected[x]);
+      .filter((x) => this.selected[x] === selectionState ?? true);
+  }
+
+  getSelectedArrows(selectionState?: SelectionState): Arrow[] {
+    return this.getSelectedArrowIds(selectionState).map(
+      (id) => this.arrows[id]
+    );
   }
 
   onClick(id: ElementId, event: ClickDetails): void {
@@ -137,17 +184,29 @@ export class Elements {
       } else {
         this.selected = {};
       }
+    } else if (event.shiftKey && !(event.ctrlKey || event.metaKey)) {
+      this.trySelectArrow(id, "primary");
     } else if (event.shiftKey && (event.ctrlKey || event.metaKey)) {
-      // TODO: work out how to check head-to-tail-ness
-      this.selected[id] = "secondary";
-    } else if (event.shiftKey) {
-      this.selected[id] = "primary";
+      this.trySelectArrow(id, "secondary");
     } else if (event.ctrlKey || event.metaKey) {
-      // TODO: work out how to build a 2-arrow
-      this.selected[id] = "secondary";
+      // TODO: behaviour of cmd+shift should be different from just cmd
+      this.trySelectArrow(id, "secondary");
     } else {
       this.selected = { [id]: "primary" };
     }
+  }
+
+  trySelectArrow(id: ArrowId, selectionType: SelectionState): void {
+    // TODO: how does unselecting work?
+    const proposedComposition = this.getSelectedArrows(selectionType).concat(
+      this.arrows[id]
+    );
+    if (composeArrows(proposedComposition)) this.selected[id] = selectionType;
+    else
+      this.addToast("Cannot compose that arrow with current selection", {
+        appearance: "warning",
+      });
+    this.addTwoArrowFromSelectionIfPossible();
   }
 
   selectionState(id: ElementId): SelectionState {

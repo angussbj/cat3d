@@ -4,10 +4,12 @@ import { useEnvironment } from "./useEnvironment";
 import { useThree } from "@react-three/fiber";
 import { Elements } from "logic";
 import { Arrow, Node } from "./entities";
+import { useToasts } from "react-toast-notifications";
 
 export function Content(): React.ReactElement {
   const { setOnBackgroundClick, render } = useEnvironment();
-  const elements = useRef(new Elements(render)).current;
+  const { addToast } = useToasts();
+  const elements = useRef(new Elements(render, addToast)).current;
   const { camera, size } = useThree();
 
   useEffect(() => {

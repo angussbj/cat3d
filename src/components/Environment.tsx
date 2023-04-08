@@ -17,7 +17,7 @@ export function Environment({
     (event: MouseEvent) => void
   >(() => {});
 
-  const [renderHelper, setRenderHelper] = useState(false);
+  const [_, setRenderHelper] = useState(false);
   const render = useCallback((): void => setRenderHelper((x) => !x), []);
 
   return (
