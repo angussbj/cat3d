@@ -218,39 +218,39 @@ export class Elements {
   }
 
   deleteNode(id: NodeId): void {
-    delete this.nodes[id];
     keys(this.arrows).forEach((arrowId) => {
       const arrow = this.arrows[arrowId];
       if (arrow.codomainId === id || arrow.domainId === id) {
-        delete this.arrows[arrowId];
+        this.deleteArrow(arrowId);
       }
     });
+    delete this.nodes[id];
   }
 
   deleteArrow(id: ArrowId): void {
-    delete this.arrows[id];
     keys(this.twoArrows).forEach((twoArrowId) => {
       const twoArrow = this.twoArrows[twoArrowId];
       if (
         twoArrow.codomainIds.includes(id) ||
         twoArrow.domainIds.includes(id)
       ) {
-        delete this.twoArrows[twoArrowId];
+        this.deleteTwoArrow(twoArrowId);
       }
     });
+    delete this.arrows[id];
   }
 
   deleteTwoArrow(id: TwoArrowId): void {
-    delete this.twoArrows[id];
     keys(this.threeArrows).forEach((threeArrowId) => {
       const threeArrow = this.threeArrows[threeArrowId];
       if (
         threeArrow.codomainIds.includes(id) ||
         threeArrow.domainIds.includes(id)
       ) {
-        delete this.threeArrows[threeArrowId];
+        this.deleteThreeArrow(threeArrowId);
       }
     });
+    delete this.twoArrows[id];
   }
 
   deleteThreeArrow(id: ThreeArrowId): void {
