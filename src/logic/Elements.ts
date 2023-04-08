@@ -125,6 +125,10 @@ export class Elements {
     return Object.values(this.arrows);
   }
 
+  getTwoArrows(): TwoArrow[] {
+    return Object.values(this.twoArrows);
+  }
+
   getArrowPoints(id: ArrowId): [Vector3, Vector3, Vector3] {
     const { domainId, guidePoint, codomainId } = this.arrows[id];
     return [
